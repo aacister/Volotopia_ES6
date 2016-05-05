@@ -1,0 +1,43 @@
+
+    <div class="page-header text-center" ng-hide="$ctrl.isLoggedIn()">
+                <h2>Please log in.</h2>
+
+        </div>
+        <div style="margin-top:15px;" ng-if="$ctrl.isLoggedIn()" ng-repeat="flight in $ctrl.user.flights | orderBy: 'departureDateTime'">
+
+            <div class="container">
+                <div class="row">
+
+                    <div class="col-sm-1" style="margin-top: 5px; margin-left: 10px;">
+                        <span><button type="button" ng-click="$ctrl.deleteFlight(flight)" class="btn btn-danger">Delete</button>
+
+                  </div>
+                  <div class="col-sm-2" style="margin-top:2px">
+                    <div  >
+                      <span style="font-size:16px; font-weight:600; margin-left:10px; color:navy;" ng-bind='flight.price'>
+
+                      </span>
+                    </div>
+                    <div style="margin-top:3px;">
+                        <span style="font-size:15px; margin-left:10px;  color: rgba(0, 0, 0, 0.5);" ng-bind='flight.airline'>
+
+                                  </span>
+                    </div>
+                </div>
+
+                <div class="col-sm-8">
+                    <div>
+                        <span style="font-size:15px; " ng-bind="flight.departureDateTime"></span><span style="left-margin:15px; font-weight: 800;color:navy;" ng-bind='flight.departureAirport'> </span>
+
+                        <span style="margin-left:5px"><i class="fa fa-long-arrow-right"></i></span>
+                    </div>
+                    <div>
+                        <span style="font-size:15px;" ng-bind='flight.arrivalDateTime'>  </span><span style="left-margin:15px;font-weight: 800; color:navy;" ng-bind='flight.airrivalAirport'></span>
+                    </div>
+                    <div>
+                        <span style="font-size:15px;" ng-bind ='flight.duration'></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        </div>

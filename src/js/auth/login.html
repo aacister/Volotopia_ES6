@@ -1,0 +1,44 @@
+
+        <div class="container">
+        <div class="page-header text-center">
+              <h1><span class="fa fa-sign-in"></span> Login</h1>
+        </div>
+        <div ng-show="error" class="alert alert-danger row">
+          <span>{{ error.message }}</span>
+        </div>
+        <div class="row">
+            <div class="col-sm-5 ">
+
+                <div class="well" style="height: 250px;">
+
+                    <form ng-submit="$ctrl.logIn()">
+                        <div class="form-group">
+                            <label>Username</label>
+                            <input type="text" placeholder="Username" required class="form-control" ng-model="$ctrl.user.username" name="username">
+                        </div>
+                        <div class="form-group">
+                            <label>Password</label>
+                            <input type="password" placeholder="Password" required class="form-control" ng-model="$ctrl.user.password" name="password">
+                        </div>
+
+                        <button type="submit" class="btn btn-warning btn-lg">Login</button>
+                    </form>
+
+
+                </div>
+            </div>
+            <div class="col-sm-2 text">
+              <table>
+              <tr style="height:50px"><td><td></tr>
+              <tr style="height:100px; "><td><i style="text-center; font-size: 125px;" class="fa fa-arrows-h"></i><td></tr>
+              <tr style="height:100px"><td><td></tr>
+              </table>
+            </div>
+            <div class="col-sm-5 ">
+                    <a href="/auth/google"><span class="fa fa-google-plus" style="font-size: 225px; padding-left:10px; padding-right:10px; background-color:#d8e6f3;"></span></a>
+            </div>
+            </div>
+            <hr>
+
+            <p class="text-center">Need an account?<a href="/#/register"> Register</a></p>
+        </div>

@@ -1,0 +1,34 @@
+
+<div class="navbar navbar-static-top">
+
+        <div class='container' role="navigation">
+          <div class='navbar-header'>
+              <a ui-sref="app.home" class="navbar-brand" ng-bind="::$ctrl.appName"></a>
+          </div>
+          <ul class="nav navbar-nav">
+              <li ng-class="{ active: activeLink('app.routes')}"><a ui-sref="app.routes" >Book a Flight</a></li>
+              <li ng-class="{ active: activeLink('app.home')}"><a ui-sref="app.myFlights">My Flights</a></li>
+              <li>
+                  <a href ng-click="$ctrl.getAirlines()" data-toggle="dropdown" ng-class="{'dropdown-toggle': airlines}">Airlines<span class="caret"></span></a>
+
+                  <ul class="dropdown-menu" ng-if="$ctrl.airlines">
+                      <li ng-repeat="airline in $ctrl.airlines | orderBy: 'title'">
+                          <a href="/#/airlines/{{airline._id}}">{{airline.title}}</a>
+                      </li>
+                  </ul>
+              </li>
+
+
+          </ul>
+          <ul class="nav navbar-nav navbar-right">
+              <li ng-show="$ctrl.isLoggedIn()"><a href="" ng-bind="$ctrl.currentUser()"></a></li>
+              <li ng-show="$ctrl.isLoggedIn()"><a href="" ng-click="$ctrl.logOut()">Log Out</a></li>
+              <li ng-hide="$ctrl.isLoggedIn()"><a ui-sref="app.register"><span class="glyphicon glyphicon-user"></span> Register</a></li>
+              <li class='divider'></li>
+              <li ng-hide="$ctrl.isLoggedIn()"><a ui-sref='app.login'><span class="glyphicon glyphicon-log-in"></span> Login</a></li>
+              <li class='divider'></li>
+              <li ng-hide="$ctrl.isLoggedIn()"><a href="app.google"><span class="fa fa-google-plus"></span> Google</a></li>
+          </ul>
+        </div>
+
+    </div>

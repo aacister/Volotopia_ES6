@@ -1,0 +1,21 @@
+
+    <div ng-repeat="airline in airlines | orderBy: 'title'">
+
+        <span class="glyphicon glyphicon-star" ng-click="incrementRatings(airline)">
+
+    </span>
+        <span> {{airline.ratings}} </span>
+        <span><a  ng-href="{{airline.link}}">
+        {{airline.title}}
+    </a>
+    </span>
+        <span>
+        <a href="#/airlines/{{airline._id}}">Comments ({{getCommentsCount(airline)}})</a>
+
+    </span>
+        <span>
+        <a href="#/airlines/{{airline._id}}">Routes ({{getRtouesCount(airline)}})</a>
+
+    </span>
+
+    </div>

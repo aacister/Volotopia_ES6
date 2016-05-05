@@ -1,0 +1,63 @@
+
+
+  <div class='container'>
+  <toaster-container toaster-options="{'time-out': 3000, 'position-class': 'toast-top-center','close-button':true}"></toaster-container>
+      <div class="col-sm-2" style="height:80%; background-color: whitesmoke;">
+
+      </div>
+      <div class="col-sm-10">
+          <div class="row" style="margin-top:15px">
+              <div class="col-sm-1"></div>
+              <div class="form-group" class="col-sm-11">
+
+              </div>
+          </div>
+
+          <div class="row">
+
+              <div class="col-sm-11" style="height: 70%; margin-top:10px; overflow-y: scroll;">
+
+             <div ng-if="error" class="alert alert-danger row page-header text-center">
+                <span>{{ error.message }}</span>
+              </div>
+                  <div ng-show="$ctrl.isSearchResultsVisible()" ng-repeat="route in $ctrl._routes  | orderBy: 'departureDateTime'">
+                      <div class="row" style=" padding-top: 10px; padding-bottom: 10px;">
+                          <div class="col-sm-1">
+                          </div>
+                          <div class="col-sm-2" style="margin-top:5px; ">
+                              <div><span style="font-size:16px; font-weight:600; margin-left:10px; color:navy;">
+          {{route.price | currency}}
+        </span>
+                              </div>
+                              <div style="margin-top: 10px; margin-left: 10px;">
+                                  <span><button type="button" ng-click="$ctrl.bookFlight(route)" ng-show="$ctrl.isLoggedIn()" style="background-color:#b73338; border:#b73338; color: white;" class="btn">Book</button>
+          <span style="font-size:12px; color:#6495ED;" ng-hide="$ctrl.isLoggedIn()">Login to book</span>
+                              </div>
+                          </div>
+                          <div class="col-sm-2" style="margin-top:15px; ">
+                              <span style="font-size:15px; float:left; color: rgba(0, 0, 0, 0.5);">{{route.airline.title}}</span>
+                          </div>
+                          <div class="col-sm-7" style="margin-top:5px;">
+                              <div>
+                                  <span style="font-size:15px; ">{{route.departureDateTime }} (EST) </span><span style="font-weight: 800;color:navy;">{{route.departureAirport.code}} </span>
+
+                                  <span style="margin-left:5px"><i class="fa fa-long-arrow-right"></i></span>
+                              </div>
+                              <div>
+                                  <span style="font-size:15px;">{{route.arrivalDateTime}} (EST) </span><span style="font-weight: 800; color:navy;">{{route.arrivalAirport.code}}</span>
+                              </div>
+                              <div style="font-size:15px;">
+                                  <span>duration: ~{{route.duration}} </span>
+                                  <span>| available: {{route.capacity - route.occupied}} </span>
+                                  <span>| capacity: {{route.capacity}}</span>
+
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+          <div class="col-sm-1">
+          </div>
+
+      </div>

@@ -1,0 +1,21 @@
+
+    <h3>
+
+<span><a  ng-href="{{airline.link}}">
+{{airline.title}}
+</a>
+</span>
+<span style= "padding-left:12px" class="glyphicon glyphicon-thumbs-up"
+  ng-click="incrementRatings(airline)">
+
+</span>
+
+<span > ({{airline.ratings}}) </span>
+</h3>
+
+    <ul id="airlineNav" class="nav nav-tabs">
+        <li ng-class="{ active: activeLink('airline.routes')}"><a ui-sref=".routes">Routes</a></li>
+        <li ng-class="{ active: activeLink('airline.comments')}"><a ui-sref=".comments">Comments</a></li>
+    </ul>
+
+    <div ui-view></div>
