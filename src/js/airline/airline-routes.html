@@ -1,0 +1,94 @@
+<script type="text/ng-template" id="/airlineRoutes.html">
+
+        <div style="margin-top:15px;" ng-repeat="route in $ctrl.airline.routes | orderBy: 'departureDateTime'">
+
+            <div class="container">
+                <div class="row">
+                    <div class="col-sm-1" ng-show="isLoggedIn()">
+                        <div style="margin-top: 10px;">
+                            <span style="font-size:12px; float:left;" ng-show="!$ctrl.isAddRouteVisible && !$ctrl.isEditRouteVisible"><a ng-href="" ng-click="$ctrl.showEditRoute(route)">edit</a></span>
+                        </div>
+                        <div style="margin-top:5px;">
+                            <span style="font-size:12px; float:left;" ng-show="!$ctrl.isAddRouteVisible && !$ctrl.isEditRouteVisible"><a ng-href="" ng-click="$ctrl.deleteRoute(route)">delete</a></span>
+                        </div>
+                    </div>
+                    <div class="col-sm-2" style="margin-top:15px;">
+                        <span style="font-size:16px; font-weight:600; margin-left:10px; color:navy;">
+            {{route.price | currency}}
+          </span>
+                    </div>
+                    <div class="col-sm-9">
+                        <div>
+                            <span style="font-size:15px; ">{{route.departureDateTime |  amDateFormat: 'dddd, MMMM Do YYYY, h:mm a' }} (EST) </span><span style="left-margin:15px; font-weight: 800;color:navy;">{{route.departureAirport.code}} </span>
+
+                            <span style="margin-left:5px"><i class="fa fa-long-arrow-right"></i></span>
+                        </div>
+                        <div>
+                            <span style="font-size:15px;">{{route.arrivalDateTime |  amDateFormat: 'dddd, MMMM Do YYYY, h:mm a'}} (EST) </span><span style="left-margin:15px;font-weight: 800; color:navy;">{{route.arrivalAirport.code}}</span>
+                        </div>
+                        <div>
+                            <span style="font-size:15px;">duration: ~{{route.duration | amDurationFormat : 'minute'}}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <div style="font-size:12px; float:right;" ng-show="!$ctrl.isAddRouteVisible && !$ctrl.isEditRouteVisible && $ctrl.isLoggedIn()"><a ng-href="" ng-click="$ctrl.addRouteClicked()">Add route</a></div>
+        <div style="font-size:12px; float:right;" ng-show="$ctrl.isAddRouteVisible && !$ctrl.isEditRouteVisible && $ctrl.isLoggedIn()"><a ng-href="" ng-click="$ctrl.removeRouteClicked()">Cancel add</a></div>
+        <form ng-submit="$ctrl.addRoute()" style="margin-top:30px; background-color:cornsilk;" ng-show="$ctrl.showAddRoute()">
+            <div class="container">
+                <div class="col-sm-6" style="margin-top: 20px; margin-bottom: 20px;">
+                    <div class="form-group">
+
+                        <label for="dateDepart">Departure (EST)</label>
+                        <input id="dateDepart" type="datetime-local" class="form-control" style="width: 400px;" placeholder="yyyy-MM-ddTHH:mm:ss" ng-model="$ctrl.addRouteFormData.departureDateTime" required />
+
+                    </div>
+                    <div class="form-group">
+                        <label for="selectDepartAirport">Departure Airport</label>
+                        <br/>
+                        <select required class="form-select" style="width: 400px;" id="selectDepartAirport" placeholder="Departure Airport" ng-model="$ctr.addRouteFormDatadepartureAirport" ng-options="airport._id as airport.code for airport in airports | orderBy: 'code'">
+                            <option value="">-- Select Departure Airport --</option>
+                        </select>
+
+                    </div>
+
+
+                    <div class="form-group">
+                        <label for="dateArrive">Arrive (EST)</label>
+                        <input type="datetime-local" id="dateArrive" class="form-control" style="width: 400px;" placeholder="yyyy-MM-ddTHH:mm:ss" ng-model="$ctrl.addRouteFormData.arrivalDateTime" required/>
+
+                    </div>
+                    <div class="form-group">
+                        <label for="selectArriveAirport">Destination Airport</label>
+                        <br/>
+                        <select class="form-select" required id="selectArriveAirport" style="width: 400px;" placeholder="Arrival Airport" ng-model="arrivalAirport" ng-options="airport._id as airport.code for airport in $ctrl.airports | orderBy: 'code'">
+                            <option value="">-- Select Destination Airport --</option>
+                        </select>
+
+                    </div>
+
+
+                    <div class="form-group">
+                        <label for="flightPrice">Price</label>
+                        <input type="Number" id="flightPrice" style="width: 400px;" class="form-control" placeholder="price" ng-model="$ctrl.addRouteFormData.price" required />
+
+                    </div>
+                    <div class="form-group">
+                        <label for="flightOccupation">Occupied</label>
+                        <input type="Number" id="flightOccupation" style="width: 400px;" class="form-control" placeholder="occupied" ng-model="$ctrl.addRouteFormData.occupied" required/>
+                    </div>
+                    <div class="form-group">
+                        <label for="fligthCapacity">Capacity</label>
+                        <input type="Number" id="flightCapacity" style="width: 400px;" class="form-control" placeholder="capacity" ng-model="$ctrl.addRouteFormData.capacity" required />
+
+                    </div>
+
+                    <span><button type="submit" class="btn btn-primary">Add Route</button></span>
+
+                </div>
+            </div>
+        </form>
+
+    </script>

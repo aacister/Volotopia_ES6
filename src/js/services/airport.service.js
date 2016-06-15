@@ -9,7 +9,7 @@ export default class Airport{
   }
 
   getAll() {
-      return this._$http.get(this.AppConstants.api + '/airports').success(
+      return this._$http.get(this._AppConstants.api + '/airports').success(
         (res) => {res.data}).error(
           (err) => {err;}
         );

@@ -1,0 +1,22 @@
+
+      <div style="margin-top: 15px;" ng-repeat="comment in $ctrl.airline.comments | orderBy: '-upvotes'">
+          <span class="glyphicon glyphicon-thumbs-up" ng-click="$ctrl.incrementUpvotes(comment)">
+
+      </span> {{comment.upvotes}} - by {{comment.author}}
+          <span style="font-size:15px; margin-left:10px;">
+      {{comment.body}}
+    </span>
+
+      </div>
+      <div style="font-size:12px; float:right;" ng-hide="$ctrl.showAddComment() || !$ctrl.isLoggedIn()"><a ng-href="" ng-click="$ctrl.addCommentClicked()">Add comment</a></div>
+      <div style="font-size:12px; float:right;" ng-show="$ctrl.showAddComment() && $ctrl.isLoggedIn()"><a ng-href="" ng-click="$ctrl.removeCommentClicked()">Disregard comment</a></div>
+      <form ng-submit="$ctrl.addComment()" style="margin-top:30px; background-color: cornsilk;" ng-show="$ctrl.showAddComment()">
+          <div class="container">
+              <div class="col-sm-6" style="margin-top: 20px; margin-bottom: 20px;">
+                  <div class="form-group">
+                      <textarea rows="4" cols="25" class="form-control" placeholder="Comment" ng-model="$ctrl.commentFormData.body" required></textarea>
+                  </div>
+                  <button type="submit" class="btn btn-primary">Post</button>
+              </div>
+          </div>
+      </form>

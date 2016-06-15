@@ -3,6 +3,7 @@ function AirlineConfig($stateProvider) {
 
   $stateProvider
   .state('app.airline', {
+    abstract: true,
     url: '/airlines/{id}',
     controller: 'AirlineCtrl',
     controllerAs: '$ctrl',
@@ -21,7 +22,45 @@ function AirlineConfig($stateProvider) {
             );
         }
     }
-  });
+  })
+  .state('airline.routes', {
+              url: '',
+              templateUrl: '/airline-routes.html',
+              controller: 'AirlineCtrl',
+              controllerAs: '$ctrl',
+              data: {
+                  activeTab: 'routes'
+
+              },
+              resolve: {
+                  airline: ['$stateParams', 'Airline', function($stateParams, Airline) {
+                      return Airline.get($stateParams.id);
+                  }],
+                  airportsResolved: ['Airport', function(Airport) {
+                      return Airport.getAll();
+                  }]
+              }
+          })
+
+          .state('airline.comments', {
+              url: '/airlines/{id}/comments',
+              templateUrl: '/airline-comments.html',
+              controller: 'AirlineCtrl',
+              controllerAs: '$ctrl',
+              data: {
+                  activeTab: 'comments'
+
+              },
+              resolve: {
+                  airline: ['$stateParams', 'Airline', function($stateParams, Airline) {
+                      return Airline.get($stateParams.id);
+                  }],
+                  airportsResolved: ['Airport', function(Airport) {
+                      return Airport.getAll();
+                  }]
+              }
+          })
+
 
 };
 
