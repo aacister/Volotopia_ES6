@@ -39470,23 +39470,15 @@ function AirlineConfig($stateProvider) {
         templateUrl: 'airline/airline.html',
         resolve: {
             airlineResolved: ["$stateParams", "Airline", function airlineResolved($stateParams, Airline) {
-                return Airline.get($stateParams.id).then(function (airline) {
-                    return airline;
-                }, function (err) {
-                    return $state.go('app.home');
-                });
+                return Airline.get($stateParams.id);
             }],
             airportsResolved: ["Airport", function airportsResolved(Airport) {
-                return Airport.getAll().then(function (airports) {
-                    return airports;
-                }, function (err) {
-                    return $state.go('app.home');
-                });
+                return Airport.getAll();
             }]
         }
-    }).state('airline.routes', {
+    }).state('.routes', {
         url: '',
-        templateUrl: '/airline-routes.html',
+        templateUrl: 'airline/airline-routes.html',
         controller: 'AirlineCtrl',
         controllerAs: '$ctrl',
         data: {
@@ -39494,16 +39486,16 @@ function AirlineConfig($stateProvider) {
 
         },
         resolve: {
-            airline: ['$stateParams', 'Airline', function ($stateParams, Airline) {
+            airlineResolved: ['$stateParams', 'Airline', function ($stateParams, Airline) {
                 return Airline.get($stateParams.id);
             }],
             airportsResolved: ['Airport', function (Airport) {
                 return Airport.getAll();
             }]
         }
-    }).state('airline.comments', {
+    }).state('.comments', {
         url: '/airlines/{id}/comments',
-        templateUrl: '/airline-comments.html',
+        templateUrl: 'airline/airline-comments.html',
         controller: 'AirlineCtrl',
         controllerAs: '$ctrl',
         data: {
@@ -39511,7 +39503,7 @@ function AirlineConfig($stateProvider) {
 
         },
         resolve: {
-            airline: ['$stateParams', 'Airline', function ($stateParams, Airline) {
+            airlineResolved: ['$stateParams', 'Airline', function ($stateParams, Airline) {
                 return Airline.get($stateParams.id);
             }],
             airportsResolved: ['Airport', function (Airport) {
@@ -39543,15 +39535,18 @@ var AirlineCtrl = function () {
 
         this._$state = $state;
         this._Auth = Auth;
-        this._airline = airlineResolved;
-        this._airports = airportsResolved;
+        this.airline = airlineResolved.data;
+        this.airports = airportsResolved.data;
         this._Airline = Airline;
 
-        this._isAddComment = false;
-        this._isAddRouteVisible = false;
-        this._isEditRouteVisible = false;
-        this._editableRoute = {};
-        this._isLoggedIn = this._Auth.isLoggedIn;
+        this.isAddComment = false;
+        this.isAddRouteVisible = false;
+        this.isEditRouteVisible = false;
+        this.editableRoute = {};
+        this.isLoggedIn = this._Auth.isLoggedIn;
+
+        this.commentFormData = {};
+        this.addRouteFormData = {};
     }
 
     _createClass(AirlineCtrl, [{
@@ -39575,28 +39570,28 @@ var AirlineCtrl = function () {
                 return;
             }
             this._Airline.addComment(airline._id, {
-                body: this._body,
+                body: this.commentFormData.body,
                 upvotes: 0
             }).success(function (comment) {
-                _this._airline.comments.push(comment);
+                _this.airline.comments.push(comment);
             });
-            this._body = '';
-            this._isAddComment = false;
+            this.commentFormData.body = '';
+            this.isAddComment = false;
         }
     }, {
         key: "showAddComment",
         value: function showAddComment() {
-            return this._isAddComment;
+            return this.isAddComment;
         }
     }, {
         key: "addCommentClicked",
         value: function addCommentClicked() {
-            this._isAddComment = true;
+            this.isAddComment = true;
         }
     }, {
         key: "removeCommentClicked",
         value: function removeCommentClicked() {
-            $this._isAddComment = false;
+            $this.isAddComment = false;
         }
     }, {
         key: "incrementRatings",
@@ -39619,83 +39614,67 @@ var AirlineCtrl = function () {
         value: function addRoute() {
             var _this2 = this;
 
-            if (this.departureAirport === '' || $scope.departureDateTime === '' || $scope.arrivalAirport === '' || $scope.arrivalDateTime === '' || $scope.price === '' || $scope.occupied === '' || $scope.capacity === '') {
+            if (this.addRouteFormData.departureAirport === '' || this.addRouteFormData.departureDateTime === '' || this.addRouteFormData.arrivalAirport === '' || this.addRouteFormData.arrivalDateTime === '' || this.addRouteFormData.price === '' || this.addRouteFormData.occupied === '' || this.addRouteFormData.capacity === '') {
                 return;
             }
 
-            var duration = getDuration($scope.departureDateTime, $scope.arrivalDateTime);
+            var duration = getDuration(this.addRouteFormData.departureDateTime, this.addRouteFormData.arrivalDateTime);
 
-            Airline.addRoute(this._airline._id, {
-                departureAirport: this._departureAirport,
-                departureDateTime: this._departureDateTime,
-                duration: this._duration,
-                arrivalDateTime: this._arrivalDateTime,
-                arrivalAirport: this._arrivalAirport,
-                price: this._price,
-                occupied: this._occupied,
-                capacity: this._capacity
+            Airline.addRoute(this.airline._id, {
+                departureAirport: this.addRouteFormData.departureAirport,
+                departureDateTime: this.addRouteFormData.departureDateTime,
+                duration: this.addRouteFormData.duration,
+                arrivalDateTime: this.addRouteFormData.arrivalDateTime,
+                arrivalAirport: this.addRouteFormData.arrivalAirport,
+                price: this.addRouteFormData.price,
+                occupied: this.addRouteFormData.occupied,
+                capacity: this.addRouteFormData.capacity
             }).success(function (route) {
-                _this2._airline.routes.push(route);
+                _this2.airline.routes.push(route);
             });
-            this._departureAirport = '';
-            this._departureDateTime = '';
-            this._duration = '';
-            this._arrivalAirport = '';
-            this._arrivalDateTime = '';
-            this._price = '';
-            this._occupied = '';
-            this._capacity = '';
-            this._isAddRouteVisible = false;
+            this.addRouteFormData.departureAirport = '';
+            this.addRouteFormData.departureDateTime = '';
+            this.addRouteFormData.duration = '';
+            this.addRouteFormData.arrivalAirport = '';
+            this.addRouteFormData.arrivalDateTime = '';
+            this.addRouteFormData.price = '';
+            this.addRouteFormData.occupied = '';
+            this.addRouteFormData.capacity = '';
+            this.isAddRouteVisible = false;
         }
     }, {
         key: "showAddRoute",
         value: function showAddRoute() {
-            return this._isAddRouteVisible;
+            return this.isAddRouteVisible;
         }
     }, {
         key: "addRouteClicked",
         value: function addRouteClicked() {
-            this._isAddRouteVisible = true;
+            this.isAddRouteVisible = true;
         }
     }, {
         key: "removeRouteClicked",
         value: function removeRouteClicked() {
-            this._isAddRouteVisible = false;
+            this.isAddRouteVisible = false;
         }
     }, {
         key: "hideEditRouteForm",
         value: function hideEditRouteForm() {
-            this._isEditRouteVisible = false;
+            this.isEditRouteVisible = false;
         }
     }, {
         key: "showEditRoute",
         value: function showEditRoute(route) {
-            this._isEditRouteVisible = true;
-            this._editableRoute = angular.copy(route);
-        }
-    }, {
-        key: "saveRoute",
-        value: function saveRoute() {
-            var _this3 = this;
-
-            var duration = getDuration(this._editableRoute.departureDateTime, this._editableRoute.arrivalDateTime);
-            this._editableRoute.duration = duration;
-            this._Airline.editRoute(this._editableRoute._id, this._editableRoute).success(function (route) {
-                _this3._airline.routes = $.grep(_this3._airline.routes, function (e) {
-                    return e._id != route._id;
-                });
-                _this3._airline.routes.push(route);
-            });
-            this._editableRoute = {};
-            this._isEditRouteVisible = false;
+            this.isEditRouteVisible = true;
+            this.editableRoute = angular.copy(route);
         }
     }, {
         key: "deleteRoute",
         value: function deleteRoute(route) {
-            var _this4 = this;
+            var _this3 = this;
 
             this._Airline.deleteRoute(route._id).success(function () {
-                _this4._airline.routes = $.grep(_this4._airline.routes, function (e) {
+                _this3.airline.routes = $.grep(_this3.airline.routes, function (e) {
                     return e._id != route._id;
                 });
             });
@@ -40134,17 +40113,17 @@ exports.default = AppRun;
 
 angular.module("templates", []).run(["$templateCache", function ($templateCache) {
   $templateCache.put("airline/airline-comments.html", "\n      <div style=\"margin-top: 15px;\" ng-repeat=\"comment in $ctrl.airline.comments | orderBy: \'-upvotes\'\">\n          <span class=\"glyphicon glyphicon-thumbs-up\" ng-click=\"$ctrl.incrementUpvotes(comment)\">\n\n      </span> {{comment.upvotes}} - by {{comment.author}}\n          <span style=\"font-size:15px; margin-left:10px;\">\n      {{comment.body}}\n    </span>\n\n      </div>\n      <div style=\"font-size:12px; float:right;\" ng-hide=\"$ctrl.showAddComment() || !$ctrl.isLoggedIn()\"><a ng-href=\"\" ng-click=\"$ctrl.addCommentClicked()\">Add comment</a></div>\n      <div style=\"font-size:12px; float:right;\" ng-show=\"$ctrl.showAddComment() && $ctrl.isLoggedIn()\"><a ng-href=\"\" ng-click=\"$ctrl.removeCommentClicked()\">Disregard comment</a></div>\n      <form ng-submit=\"$ctrl.addComment()\" style=\"margin-top:30px; background-color: cornsilk;\" ng-show=\"$ctrl.showAddComment()\">\n          <div class=\"container\">\n              <div class=\"col-sm-6\" style=\"margin-top: 20px; margin-bottom: 20px;\">\n                  <div class=\"form-group\">\n                      <textarea rows=\"4\" cols=\"25\" class=\"form-control\" placeholder=\"Comment\" ng-model=\"$ctrl.commentFormData.body\" required></textarea>\n                  </div>\n                  <button type=\"submit\" class=\"btn btn-primary\">Post</button>\n              </div>\n          </div>\n      </form>\n");
-  $templateCache.put("airline/airline-routes.html", "<script type=\"text/ng-template\" id=\"/airlineRoutes.html\">\n\n        <div style=\"margin-top:15px;\" ng-repeat=\"route in $ctrl.airline.routes | orderBy: \'departureDateTime\'\">\n\n            <div class=\"container\">\n                <div class=\"row\">\n                    <div class=\"col-sm-1\" ng-show=\"isLoggedIn()\">\n                        <div style=\"margin-top: 10px;\">\n                            <span style=\"font-size:12px; float:left;\" ng-show=\"!$ctrl.isAddRouteVisible && !$ctrl.isEditRouteVisible\"><a ng-href=\"\" ng-click=\"$ctrl.showEditRoute(route)\">edit</a></span>\n                        </div>\n                        <div style=\"margin-top:5px;\">\n                            <span style=\"font-size:12px; float:left;\" ng-show=\"!$ctrl.isAddRouteVisible && !$ctrl.isEditRouteVisible\"><a ng-href=\"\" ng-click=\"$ctrl.deleteRoute(route)\">delete</a></span>\n                        </div>\n                    </div>\n                    <div class=\"col-sm-2\" style=\"margin-top:15px;\">\n                        <span style=\"font-size:16px; font-weight:600; margin-left:10px; color:navy;\">\n            {{route.price | currency}}\n          </span>\n                    </div>\n                    <div class=\"col-sm-9\">\n                        <div>\n                            <span style=\"font-size:15px; \">{{route.departureDateTime |  amDateFormat: \'dddd, MMMM Do YYYY, h:mm a\' }} (EST) </span><span style=\"left-margin:15px; font-weight: 800;color:navy;\">{{route.departureAirport.code}} </span>\n\n                            <span style=\"margin-left:5px\"><i class=\"fa fa-long-arrow-right\"></i></span>\n                        </div>\n                        <div>\n                            <span style=\"font-size:15px;\">{{route.arrivalDateTime |  amDateFormat: \'dddd, MMMM Do YYYY, h:mm a\'}} (EST) </span><span style=\"left-margin:15px;font-weight: 800; color:navy;\">{{route.arrivalAirport.code}}</span>\n                        </div>\n                        <div>\n                            <span style=\"font-size:15px;\">duration: ~{{route.duration | amDurationFormat : \'minute\'}}</span>\n                        </div>\n                    </div>\n                </div>\n            </div>\n\n        </div>\n        <div style=\"font-size:12px; float:right;\" ng-show=\"!$ctrl.isAddRouteVisible && !$ctrl.isEditRouteVisible && $ctrl.isLoggedIn()\"><a ng-href=\"\" ng-click=\"$ctrl.addRouteClicked()\">Add route</a></div>\n        <div style=\"font-size:12px; float:right;\" ng-show=\"$ctrl.isAddRouteVisible && !$ctrl.isEditRouteVisible && $ctrl.isLoggedIn()\"><a ng-href=\"\" ng-click=\"$ctrl.removeRouteClicked()\">Cancel add</a></div>\n        <form ng-submit=\"$ctrl.addRoute()\" style=\"margin-top:30px; background-color:cornsilk;\" ng-show=\"$ctrl.showAddRoute()\">\n            <div class=\"container\">\n                <div class=\"col-sm-6\" style=\"margin-top: 20px; margin-bottom: 20px;\">\n                    <div class=\"form-group\">\n\n                        <label for=\"dateDepart\">Departure (EST)</label>\n                        <input id=\"dateDepart\" type=\"datetime-local\" class=\"form-control\" style=\"width: 400px;\" placeholder=\"yyyy-MM-ddTHH:mm:ss\" ng-model=\"$ctrl.addRouteFormData.departureDateTime\" required />\n\n                    </div>\n                    <div class=\"form-group\">\n                        <label for=\"selectDepartAirport\">Departure Airport</label>\n                        <br/>\n                        <select required class=\"form-select\" style=\"width: 400px;\" id=\"selectDepartAirport\" placeholder=\"Departure Airport\" ng-model=\"$ctr.addRouteFormDatadepartureAirport\" ng-options=\"airport._id as airport.code for airport in airports | orderBy: \'code\'\">\n                            <option value=\"\">-- Select Departure Airport --</option>\n                        </select>\n\n                    </div>\n\n\n                    <div class=\"form-group\">\n                        <label for=\"dateArrive\">Arrive (EST)</label>\n                        <input type=\"datetime-local\" id=\"dateArrive\" class=\"form-control\" style=\"width: 400px;\" placeholder=\"yyyy-MM-ddTHH:mm:ss\" ng-model=\"$ctrl.addRouteFormData.arrivalDateTime\" required/>\n\n                    </div>\n                    <div class=\"form-group\">\n                        <label for=\"selectArriveAirport\">Destination Airport</label>\n                        <br/>\n                        <select class=\"form-select\" required id=\"selectArriveAirport\" style=\"width: 400px;\" placeholder=\"Arrival Airport\" ng-model=\"arrivalAirport\" ng-options=\"airport._id as airport.code for airport in $ctrl.airports | orderBy: \'code\'\">\n                            <option value=\"\">-- Select Destination Airport --</option>\n                        </select>\n\n                    </div>\n\n\n                    <div class=\"form-group\">\n                        <label for=\"flightPrice\">Price</label>\n                        <input type=\"Number\" id=\"flightPrice\" style=\"width: 400px;\" class=\"form-control\" placeholder=\"price\" ng-model=\"$ctrl.addRouteFormData.price\" required />\n\n                    </div>\n                    <div class=\"form-group\">\n                        <label for=\"flightOccupation\">Occupied</label>\n                        <input type=\"Number\" id=\"flightOccupation\" style=\"width: 400px;\" class=\"form-control\" placeholder=\"occupied\" ng-model=\"$ctrl.addRouteFormData.occupied\" required/>\n                    </div>\n                    <div class=\"form-group\">\n                        <label for=\"fligthCapacity\">Capacity</label>\n                        <input type=\"Number\" id=\"flightCapacity\" style=\"width: 400px;\" class=\"form-control\" placeholder=\"capacity\" ng-model=\"$ctrl.addRouteFormData.capacity\" required />\n\n                    </div>\n\n                    <span><button type=\"submit\" class=\"btn btn-primary\">Add Route</button></span>\n\n                </div>\n            </div>\n        </form>\n\n    </script>\n");
-  $templateCache.put("airline/airline.html", "\n    <h3>\n\n<span><a  ng-href=\"{{airline.link}}\">\n{{airline.title}}\n</a>\n</span>\n<span style= \"padding-left:12px\" class=\"glyphicon glyphicon-thumbs-up\"\n  ng-click=\"incrementRatings(airline)\">\n\n</span>\n\n<span > ({{airline.ratings}}) </span>\n</h3>\n\n    <ul id=\"airlineNav\" class=\"nav nav-tabs\">\n        <li ng-class=\"{ active: activeLink(\'airline.routes\')}\"><a ui-sref=\".routes\">Routes</a></li>\n        <li ng-class=\"{ active: activeLink(\'airline.comments\')}\"><a ui-sref=\".comments\">Comments</a></li>\n    </ul>\n\n    <div ui-view></div>\n");
+  $templateCache.put("airline/airline-routes.html", "<script type=\"text/ng-template\" id=\"/airlineRoutes.html\">\n\n        <div style=\"margin-top:15px;\" ng-repeat=\"route in $ctrl.airline.routes | orderBy: \'departureDateTime\'\">\n\n            <div class=\"container\">\n                <div class=\"row\">\n                    <div class=\"col-sm-1\" ng-show=\"isLoggedIn()\">\n                        <div style=\"margin-top: 10px;\">\n                            <span style=\"font-size:12px; float:left;\" ng-show=\"!$ctrl.isAddRouteVisible && !$ctrl.isEditRouteVisible\"><a ng-href=\"\" ng-click=\"$ctrl.showEditRoute(route)\">edit</a></span>\n                        </div>\n                        <div style=\"margin-top:5px;\">\n                            <span style=\"font-size:12px; float:left;\" ng-show=\"!$ctrl.isAddRouteVisible && !$ctrl.isEditRouteVisible\"><a ng-href=\"\" ng-click=\"$ctrl.deleteRoute(route)\">delete</a></span>\n                        </div>\n                    </div>\n                    <div class=\"col-sm-2\" style=\"margin-top:15px;\">\n                        <span style=\"font-size:16px; font-weight:600; margin-left:10px; color:navy;\">\n            {{route.price | currency}}\n          </span>\n                    </div>\n                    <div class=\"col-sm-9\">\n                        <div>\n                            <span style=\"font-size:15px; \">{{route.departureDateTime |  amDateFormat: \'dddd, MMMM Do YYYY, h:mm a\' }} (EST) </span><span style=\"left-margin:15px; font-weight: 800;color:navy;\">{{route.departureAirport.code}} </span>\n\n                            <span style=\"margin-left:5px\"><i class=\"fa fa-long-arrow-right\"></i></span>\n                        </div>\n                        <div>\n                            <span style=\"font-size:15px;\">{{route.arrivalDateTime |  amDateFormat: \'dddd, MMMM Do YYYY, h:mm a\'}} (EST) </span><span style=\"left-margin:15px;font-weight: 800; color:navy;\">{{route.arrivalAirport.code}}</span>\n                        </div>\n                        <div>\n                            <span style=\"font-size:15px;\">duration: ~{{route.duration | amDurationFormat : \'minute\'}}</span>\n                        </div>\n                    </div>\n                </div>\n            </div>\n\n        </div>\n        <div style=\"font-size:12px; float:right;\" ng-show=\"!$ctrl.isAddRouteVisible && !$ctrl.isEditRouteVisible && $ctrl.isLoggedIn()\"><a ng-href=\"\" ng-click=\"$ctrl.addRouteClicked()\">Add route</a></div>\n        <div style=\"font-size:12px; float:right;\" ng-show=\"$ctrl.isAddRouteVisible && !$ctrl.isEditRouteVisible && $ctrl.isLoggedIn()\"><a ng-href=\"\" ng-click=\"$ctrl.removeRouteClicked()\">Cancel add</a></div>\n        <form ng-submit=\"$ctrl.addRoute()\" style=\"margin-top:30px; background-color:cornsilk;\" ng-show=\"$ctrl.showAddRoute()\">\n            <div class=\"container\">\n                <div class=\"col-sm-6\" style=\"margin-top: 20px; margin-bottom: 20px;\">\n                    <div class=\"form-group\">\n\n                        <label for=\"dateDepart\">Departure (EST)</label>\n                        <input id=\"dateDepart\" type=\"datetime-local\" class=\"form-control\" style=\"width: 400px;\" placeholder=\"yyyy-MM-ddTHH:mm:ss\" ng-model=\"$ctrl.addRouteFormData.departureDateTime\" required />\n\n                    </div>\n                    <div class=\"form-group\">\n                        <label for=\"selectDepartAirport\">Departure Airport</label>\n                        <br/>\n                        <select required class=\"form-select\" style=\"width: 400px;\" id=\"selectDepartAirport\" placeholder=\"Departure Airport\" ng-model=\"$ctr.addRouteFormData.departureAirport\" ng-options=\"airport._id as airport.code for airport in airports | orderBy: \'code\'\">\n                            <option value=\"\">-- Select Departure Airport --</option>\n                        </select>\n\n                    </div>\n\n\n                    <div class=\"form-group\">\n                        <label for=\"dateArrive\">Arrive (EST)</label>\n                        <input type=\"datetime-local\" id=\"dateArrive\" class=\"form-control\" style=\"width: 400px;\" placeholder=\"yyyy-MM-ddTHH:mm:ss\" ng-model=\"$ctrl.addRouteFormData.arrivalDateTime\" required/>\n\n                    </div>\n                    <div class=\"form-group\">\n                        <label for=\"selectArriveAirport\">Destination Airport</label>\n                        <br/>\n                        <select class=\"form-select\" required id=\"selectArriveAirport\" style=\"width: 400px;\" placeholder=\"Arrival Airport\" ng-model=\"arrivalAirport\" ng-options=\"airport._id as airport.code for airport in $ctrl.airports | orderBy: \'code\'\">\n                            <option value=\"\">-- Select Destination Airport --</option>\n                        </select>\n\n                    </div>\n\n\n                    <div class=\"form-group\">\n                        <label for=\"flightPrice\">Price</label>\n                        <input type=\"Number\" id=\"flightPrice\" style=\"width: 400px;\" class=\"form-control\" placeholder=\"price\" ng-model=\"$ctrl.addRouteFormData.price\" required />\n\n                    </div>\n                    <div class=\"form-group\">\n                        <label for=\"flightOccupation\">Occupied</label>\n                        <input type=\"Number\" id=\"flightOccupation\" style=\"width: 400px;\" class=\"form-control\" placeholder=\"occupied\" ng-model=\"$ctrl.addRouteFormData.occupied\" required/>\n                    </div>\n                    <div class=\"form-group\">\n                        <label for=\"fligthCapacity\">Capacity</label>\n                        <input type=\"Number\" id=\"flightCapacity\" style=\"width: 400px;\" class=\"form-control\" placeholder=\"capacity\" ng-model=\"$ctrl.addRouteFormData.capacity\" required />\n\n                    </div>\n\n                    <span><button type=\"submit\" class=\"btn btn-primary\">Add Route</button></span>\n\n                </div>\n            </div>\n        </form>\n\n    </script>\n");
+  $templateCache.put("airline/airline.html", "\n    <h3>\n\n<span><a  ng-href=\"{{airline.link}}\">\n{{airline.title}}\n</a>\n</span>\n<span style= \"padding-left:12px\" class=\"glyphicon glyphicon-thumbs-up\"\n  ng-click=\"incrementRatings(airline)\">\n\n</span>\n\n<span > ({{airline.ratings}}) </span>\n</h3>\n\n    <ul id=\"airlineNav\" class=\"nav nav-tabs\">\n        <li ><a ui-sref=\".routes\">Routes</a></li>\n        <li><a ui-sref=\".comments\">Comments</a></li>\n    </ul>\n\n    <div ui-view></div>\n");
   $templateCache.put("airlines/airlines.html", "\n    <div ng-repeat=\"airline in airlines | orderBy: \'title\'\">\n\n        <span class=\"glyphicon glyphicon-star\" ng-click=\"incrementRatings(airline)\">\n\n    </span>\n        <span> {{airline.ratings}} </span>\n        <span><a  ng-href=\"{{airline.link}}\">\n        {{airline.title}}\n    </a>\n    </span>\n        <span>\n        <a href=\"#/airlines/{{airline._id}}\">Comments ({{getCommentsCount(airline)}})</a>\n\n    </span>\n        <span>\n        <a href=\"#/airlines/{{airline._id}}\">Routes ({{getRtouesCount(airline)}})</a>\n\n    </span>\n\n    </div>\n");
   $templateCache.put("auth/login.html", "\n        <div class=\"container\">\n        <div class=\"page-header text-center\">\n              <h1><span class=\"fa fa-sign-in\"></span> Login</h1>\n        </div>\n        <div ng-show=\"error\" class=\"alert alert-danger row\">\n          <span>{{ error.message }}</span>\n        </div>\n        <div class=\"row\">\n            <div class=\"col-sm-5 \">\n\n                <div class=\"well\" style=\"height: 250px;\">\n\n                    <form ng-submit=\"$ctrl.logIn()\">\n                        <div class=\"form-group\">\n                            <label>Username</label>\n                            <input type=\"text\" placeholder=\"Username\" required class=\"form-control\" ng-model=\"$ctrl.user.username\" name=\"username\">\n                        </div>\n                        <div class=\"form-group\">\n                            <label>Password</label>\n                            <input type=\"password\" placeholder=\"Password\" required class=\"form-control\" ng-model=\"$ctrl.user.password\" name=\"password\">\n                        </div>\n\n                        <button type=\"submit\" class=\"btn btn-warning btn-lg\">Login</button>\n                    </form>\n\n\n                </div>\n            </div>\n            <div class=\"col-sm-2 text\">\n              <table>\n              <tr style=\"height:50px\"><td><td></tr>\n              <tr style=\"height:100px; \"><td><i style=\"text-center; font-size: 125px;\" class=\"fa fa-arrows-h\"></i><td></tr>\n              <tr style=\"height:100px\"><td><td></tr>\n              </table>\n            </div>\n            <div class=\"col-sm-5 \">\n                    <a href=\"/auth/google\"><span class=\"fa fa-google-plus\" style=\"font-size: 225px; padding-left:10px; padding-right:10px; background-color:#d8e6f3;\"></span></a>\n            </div>\n            </div>\n            <hr>\n\n            <p class=\"text-center\">Need an account?<a href=\"/#/register\"> Register</a></p>\n        </div>\n");
   $templateCache.put("auth/register.html", "\n        <div class=\"container\">\n            <div class=\"page-header text-center\">\n                <h1><span class=\"glyphicon glyphicon-user\"></span> Register</h1>\n            </div>\n            <div ng-show=\"error\" class=\"alert alert-danger row\">\n              <span>{{ error.message }}</span>\n            </div>\n            <div class=\"row\">\n                <div class=\"col-sm-5 \">\n\n                    <div class=\"well\" style=\"height: 250px;\">\n\n                        <form ng-submit=\"$ctrl.register()\">\n                            <div class=\"form-group\">\n                                <label>Username</label>\n                                <input type=\"text\" placeholder=\"Username\" required class=\"form-control\" ng-model=\"$ctrl.user.username\" name=\"username\">\n                            </div>\n                            <div class=\"form-group\">\n                                <label>Password</label>\n                                <input type=\"password\" placeholder=\"Password\" required class=\"form-control\" ng-model=\"$ctrl.user.password\" name=\"password\">\n                            </div>\n\n                            <button type=\"submit\" class=\"btn btn-warning btn-lg\">Register</button>\n                        </form>\n\n\n                    </div>\n                </div>\n                <div class=\"col-sm-2 text\">\n                  <table>\n                  <tr style=\"height:50px\"><td><td></tr>\n                  <tr style=\"height:100px; \"><td><i style=\"text-center; font-size: 125px;\" class=\"fa fa-arrows-h\"></i><td></tr>\n                  <tr style=\"height:100px\"><td><td></tr>\n                  </table>\n                </div>\n                <div class=\"col-sm-5 \">\n\n                        <a href=\"/auth/google\"><span class=\"fa fa-google-plus\" style=\"font-size: 225px; padding-left:10px; padding-right:10px; background-color:#d8e6f3;\"></span></a>\n\n\n                </div>\n            </div>\n            <hr>\n            <p class=\"text-center\">Already have an account? <a href=\"/#/login\">Login</a></p>\n\n\n        </div>\n");
-  $templateCache.put("home/home.html", "\n   <div class=\"jumbotron text-center\" style=\"margin-top:50px; \">\n       <div ng-bind=\"::$ctrl.test\"></div>\n       <div style=\"float:right;margin-top:4px;\" ng-bind=\"::$ctrl.signature\"></div>\n   </div>\n");
   $templateCache.put("layout/app-view.html", "<app-header></app-header>\n\n\n<div class=\"container\">\n        <ui-view></ui-view>\n    </div>\n<app-footer></app-footer>\n");
   $templateCache.put("layout/footer.html", "\n\n  <div class=\"footer\">\n      <div class=\"container\">\n          <div class=\"row\">\n              <div class=\"col-sm-4\"></div>\n              <div class=\"col-sm-6  col-xs-6 center-block\" style=\"font-style: italic; padding-top: 10px;\">\n                  <div class=\"row\">\n                      <a class=\"logo-font\" ui-sref=\"app.home\" ng-bind=\"::$ctrl.appName\"></a>\n                      <span> is an American company</span>\n                  </div>\n                  <div style=\"font-size:9.5px; padding-left:40px;\" class=\"row center-block\">\n                      &copy; {{::$ctrl.date | date:\'yyyy\'}}.\n                  </div>\n              </div>\n              <div class=\"col-sm-2  col-xs-4 \" style=\"font-size: 9.5px;\">\n                  <h7>Contact Us</h7>\n                  <ul class=\"list-unstyled\">\n                      <li><i class=\"glyphicon glyphicon-globe\"></i> Fairfax, VA</li>\n                      <li><i class=\"glyphicon glyphicon-phone\"></i> 555.555.5555</li>\n                      <li><i class=\"glyphicon glyphicon-envelope\"></i> <a href=\"mailto:info@volotopia.com\">info@volotopia.com</a></li>\n                  </ul>\n              </div>\n          </div>\n      </div>\n</div>\n");
   $templateCache.put("layout/header.html", "\n<div class=\"navbar navbar-static-top\">\n\n        <div class=\'container\' role=\"navigation\">\n          <div class=\'navbar-header\'>\n              <a ui-sref=\"app.home\" class=\"navbar-brand\" ng-bind=\"::$ctrl.appName\"></a>\n          </div>\n          <ul class=\"nav navbar-nav\">\n              <li ng-class=\"{ active: activeLink(\'app.routes\')}\"><a ui-sref=\"app.routes\" >Book a Flight</a></li>\n              <li ng-class=\"{ active: activeLink(\'app.home\')}\"><a ui-sref=\"app.myFlights\">My Flights</a></li>\n              <li>\n                  <a href ng-click=\"$ctrl.getAirlines()\" data-toggle=\"dropdown\" ng-class=\"{\'dropdown-toggle\': airlines}\">Airlines<span class=\"caret\"></span></a>\n\n                  <ul class=\"dropdown-menu\" ng-if=\"$ctrl.airlines\">\n                      <li ng-repeat=\"airline in $ctrl.airlines | orderBy: \'title\'\">\n                          <a href=\"/#/airlines/{{airline._id}}\">{{airline.title}}</a>\n                      </li>\n                  </ul>\n              </li>\n\n\n          </ul>\n          <ul class=\"nav navbar-nav navbar-right\">\n              <li ng-show=\"$ctrl.isLoggedIn()\"><a href=\"\" ng-bind=\"$ctrl.currentUser()\"></a></li>\n              <li ng-show=\"$ctrl.isLoggedIn()\"><a href=\"\" ng-click=\"$ctrl.logOut()\">Log Out</a></li>\n              <li ng-hide=\"$ctrl.isLoggedIn()\"><a ui-sref=\"app.register\"><span class=\"glyphicon glyphicon-user\"></span> Register</a></li>\n              <li class=\'divider\'></li>\n              <li ng-hide=\"$ctrl.isLoggedIn()\"><a ui-sref=\'app.login\'><span class=\"glyphicon glyphicon-log-in\"></span> Login</a></li>\n              <li class=\'divider\'></li>\n              <li ng-hide=\"$ctrl.isLoggedIn()\"><a href=\"app.google\"><span class=\"fa fa-google-plus\"></span> Google</a></li>\n          </ul>\n        </div>\n\n    </div>\n");
-  $templateCache.put("myFlights/myFlights.html", "\n    <div class=\"page-header text-center\" ng-hide=\"$ctrl.isLoggedIn()\">\n                <h2>Please log in.</h2>\n\n        </div>\n        <div style=\"margin-top:15px;\" ng-if=\"$ctrl.isLoggedIn()\" ng-repeat=\"flight in $ctrl.user.flights | orderBy: \'departureDateTime\'\">\n\n            <div class=\"container\">\n                <div class=\"row\">\n\n                    <div class=\"col-sm-1\" style=\"margin-top: 5px; margin-left: 10px;\">\n                        <span><button type=\"button\" ng-click=\"$ctrl.deleteFlight(flight)\" class=\"btn btn-danger\">Delete</button>\n\n                  </div>\n                  <div class=\"col-sm-2\" style=\"margin-top:2px\">\n                    <div  >\n                      <span style=\"font-size:16px; font-weight:600; margin-left:10px; color:navy;\" ng-bind=\'flight.price\'>\n\n                      </span>\n                    </div>\n                    <div style=\"margin-top:3px;\">\n                        <span style=\"font-size:15px; margin-left:10px;  color: rgba(0, 0, 0, 0.5);\" ng-bind=\'flight.airline\'>\n\n                                  </span>\n                    </div>\n                </div>\n\n                <div class=\"col-sm-8\">\n                    <div>\n                        <span style=\"font-size:15px; \" ng-bind=\"flight.departureDateTime\"></span><span style=\"left-margin:15px; font-weight: 800;color:navy;\" ng-bind=\'flight.departureAirport\'> </span>\n\n                        <span style=\"margin-left:5px\"><i class=\"fa fa-long-arrow-right\"></i></span>\n                    </div>\n                    <div>\n                        <span style=\"font-size:15px;\" ng-bind=\'flight.arrivalDateTime\'>  </span><span style=\"left-margin:15px;font-weight: 800; color:navy;\" ng-bind=\'flight.airrivalAirport\'></span>\n                    </div>\n                    <div>\n                        <span style=\"font-size:15px;\" ng-bind =\'flight.duration\'></span>\n                    </div>\n                </div>\n            </div>\n        </div>\n        </div>\n");
-  $templateCache.put("routes/routes.html", "\n\n  <div class=\'container\'>\n  <toaster-container toaster-options=\"{\'time-out\': 3000, \'position-class\': \'toast-top-center\',\'close-button\':true}\"></toaster-container>\n      <div class=\"col-sm-2\" style=\"height:80%; background-color: whitesmoke;\">\n\n      </div>\n      <div class=\"col-sm-10\">\n          <div class=\"row\" style=\"margin-top:15px\">\n              <div class=\"col-sm-1\"></div>\n              <div class=\"form-group\" class=\"col-sm-11\">\n\n              </div>\n          </div>\n\n          <div class=\"row\">\n\n              <div class=\"col-sm-11\" style=\"height: 70%; margin-top:10px; overflow-y: scroll;\">\n\n             <div ng-if=\"error\" class=\"alert alert-danger row page-header text-center\">\n                <span>{{ error.message }}</span>\n              </div>\n                  <div ng-show=\"$ctrl.isSearchResultsVisible()\" ng-repeat=\"route in $ctrl._routes  | orderBy: \'departureDateTime\'\">\n                      <div class=\"row\" style=\" padding-top: 10px; padding-bottom: 10px;\">\n                          <div class=\"col-sm-1\">\n                          </div>\n                          <div class=\"col-sm-2\" style=\"margin-top:5px; \">\n                              <div><span style=\"font-size:16px; font-weight:600; margin-left:10px; color:navy;\">\n          {{route.price | currency}}\n        </span>\n                              </div>\n                              <div style=\"margin-top: 10px; margin-left: 10px;\">\n                                  <span><button type=\"button\" ng-click=\"$ctrl.bookFlight(route)\" ng-show=\"$ctrl.isLoggedIn()\" style=\"background-color:#b73338; border:#b73338; color: white;\" class=\"btn\">Book</button>\n          <span style=\"font-size:12px; color:#6495ED;\" ng-hide=\"$ctrl.isLoggedIn()\">Login to book</span>\n                              </div>\n                          </div>\n                          <div class=\"col-sm-2\" style=\"margin-top:15px; \">\n                              <span style=\"font-size:15px; float:left; color: rgba(0, 0, 0, 0.5);\">{{route.airline.title}}</span>\n                          </div>\n                          <div class=\"col-sm-7\" style=\"margin-top:5px;\">\n                              <div>\n                                  <span style=\"font-size:15px; \">{{route.departureDateTime }} (EST) </span><span style=\"font-weight: 800;color:navy;\">{{route.departureAirport.code}} </span>\n\n                                  <span style=\"margin-left:5px\"><i class=\"fa fa-long-arrow-right\"></i></span>\n                              </div>\n                              <div>\n                                  <span style=\"font-size:15px;\">{{route.arrivalDateTime}} (EST) </span><span style=\"font-weight: 800; color:navy;\">{{route.arrivalAirport.code}}</span>\n                              </div>\n                              <div style=\"font-size:15px;\">\n                                  <span>duration: ~{{route.duration}} </span>\n                                  <span>| available: {{route.capacity - route.occupied}} </span>\n                                  <span>| capacity: {{route.capacity}}</span>\n\n                              </div>\n                          </div>\n                      </div>\n                  </div>\n              </div>\n          </div>\n          <div class=\"col-sm-1\">\n          </div>\n\n      </div>\n");
+  $templateCache.put("myFlights/myFlights.html", "\n    <div class=\"page-header text-center\" ng-hide=\"$ctrl.isLoggedIn()\">\n                <h2>Please log in.</h2>\n\n        </div>\n        <div style=\"margin-top:15px;\" ng-if=\"$ctrl.isLoggedIn()\" ng-repeat=\"flight in $ctrl.user.flights | orderBy: \'departureDateTime\'\">\n\n            <div class=\"container\">\n                <div class=\"row\">\n\n                    <div class=\"col-sm-1\" style=\"margin-top: 5px; margin-left: 10px;\">\n                        <span><button type=\"button\" ng-click=\"$ctrl.deleteFlight(flight)\" class=\"btn btn-danger\">Delete</button>\n\n                  </div>\n                  <div class=\"col-sm-2\" style=\"margin-top:2px\">\n                    <div  >\n                      <span style=\"font-size:16px; font-weight:600; margin-left:10px; color:navy;\" ng-bind=\'flight.price | currency\'>\n\n                      </span>\n                    </div>\n                    <div style=\"margin-top:3px;\">\n                        <span style=\"font-size:15px; margin-left:10px;  color: rgba(0, 0, 0, 0.5);\" ng-bind=\'flight.airline\'>\n\n                                  </span>\n                    </div>\n                </div>\n\n                <div class=\"col-sm-8\">\n                    <div>\n                        <span style=\"font-size:15px; \" ng-bind=\"flight.departureDateTime | date:\'M/d/yyyy HH:mm:ss\'\"></span> <span style=\"left-margin:15px; font-weight: 800;color:navy;\" ng-bind=\'flight.departureAirport\'> </span>\n\n                        <span style=\"margin-left:5px\"><i class=\"fa fa-long-arrow-right\"></i></span>\n                    </div>\n                    <div>\n                        <span style=\"font-size:15px;\" ng-bind=\"flight.arrivalDateTime | date:\'M/d/yyyy HH:mm:ss\'\">  </span> <span style=\"left-margin:15px;font-weight: 800; color:navy;\" ng-bind=\'flight.airrivalAirport\'></span>\n                    </div>\n\n                </div>\n            </div>\n        </div>\n        </div>\n");
+  $templateCache.put("routes/routes.html", "\n\n  <div class=\'container\'>\n  <toaster-container toaster-options=\"{\'time-out\': 3000, \'position-class\': \'toast-top-center\',\'close-button\':true}\"></toaster-container>\n      <div class=\"col-sm-2\" style=\"height:80%; background-color: whitesmoke;\">\n\n      </div>\n      <div class=\"col-sm-10\">\n          <div class=\"row\" style=\"margin-top:15px\">\n              <div class=\"col-sm-1\"></div>\n              <div class=\"form-group\" class=\"col-sm-11\">\n\n              </div>\n          </div>\n\n          <div class=\"row\">\n\n              <div class=\"col-sm-11\" style=\"height: 70%; margin-top:10px; overflow-y: scroll;\">\n\n             <div ng-if=\"error\" class=\"alert alert-danger row page-header text-center\">\n                <span>{{ error.message }}</span>\n              </div>\n                  <div ng-show=\"$ctrl.isSearchResultsVisible()\" ng-repeat=\"route in $ctrl._routes  | orderBy: \'departureDateTime\'\">\n                      <div class=\"row\" style=\" padding-top: 10px; padding-bottom: 10px;\">\n                          <div class=\"col-sm-1\">\n                          </div>\n                          <div class=\"col-sm-2\" style=\"margin-top:5px; \">\n                              <div><span style=\"font-size:16px; font-weight:600; margin-left:10px; color:navy;\">\n          {{route.price | currency}}\n        </span>\n                              </div>\n                              <div style=\"margin-top: 10px; margin-left: 10px;\">\n                                  <span><button type=\"button\" ng-click=\"$ctrl.bookFlight(route)\" ng-show=\"$ctrl.isLoggedIn()\" style=\"background-color:#b73338; border:#b73338; color: white;\" class=\"btn\">Book</button>\n          <span style=\"font-size:12px; color:#6495ED;\" ng-hide=\"$ctrl.isLoggedIn()\">Login to book</span>\n                              </div>\n                          </div>\n                          <div class=\"col-sm-2\" style=\"margin-top:15px; \">\n                              <span style=\"font-size:15px; float:left; color: rgba(0, 0, 0, 0.5);\">{{route.airline.title}}</span>\n                          </div>\n                          <div class=\"col-sm-7\" style=\"margin-top:5px;\">\n                              <div>\n                                  <span style=\"font-size:15px; \">{{route.departureDateTime | date:\'M/d/yyyy HH:mm:ss\'}} </span><span style=\"font-weight: 800;color:navy;\">{{route.departureAirport.code}} </span>\n\n                                  <span style=\"margin-left:5px\"><i class=\"fa fa-long-arrow-right\"></i></span>\n                              </div>\n                              <div>\n                                  <span style=\"font-size:15px;\">{{route.arrivalDateTime | date:\'M/d/yyyy HH:mm:ss\'}}  </span><span style=\"font-weight: 800; color:navy;\">{{route.arrivalAirport.code}}</span>\n                              </div>\n                              <div style=\"font-size:15px;\">\n                                  <span>duration: ~{{route.duration}} </span>\n                                  <span>| available: {{route.capacity - route.occupied}} </span>\n                                  <span>| capacity: {{route.capacity}}</span>\n\n                              </div>\n                          </div>\n                      </div>\n                  </div>\n              </div>\n          </div>\n          <div class=\"col-sm-1\">\n          </div>\n\n      </div>\n");
+  $templateCache.put("home/home.html", "\n   <div class=\"jumbotron text-center\" style=\"margin-top:50px; \">\n       <div ng-bind=\"::$ctrl.test\"></div>\n       <div style=\"float:right;margin-top:4px;\" ng-bind=\"::$ctrl.signature\"></div>\n   </div>\n");
 }]);
 
 },{}],20:[function(require,module,exports){
@@ -40182,7 +40161,7 @@ var HomeCtrl = function HomeCtrl(AppConstants) {
   _classCallCheck(this, HomeCtrl);
 
   this.appName = AppConstants.appName;
-  this.test = "Volotopia is currently work in progress.  The site is modeled after a travel agency site, where a user can browse, and purchase airline flights. " + "The site stands as a means to publish my work within the MEAN stack (Mongo, Express.js, Angular.js, Node.js). Volotopia is not to be viewed as a professional site, as it has been " + "quickly designed and constructed for sharpening, and training my development skills. It will be refactored in near future to include custom directives, and usage of different techniches " + " of transitioning state b/w controllers, i.e. a state service and/or $emit and $broadcasts.  It should be " + "noted, the site exists mainly to show function, and I do not profess to be a designer.  That being said, it is desired, at completion, to have the application scaled to multiple screens, whether mobile or desktop, using bootstrap. ";
+  this.test = "Volotopia is currently work in progress.  The site is modeled after a travel agency site, where a user can browse, and purchase airline flights. " + "The site stands as a means to publish my work within the MEAN stack (Mongo, Express.js, Angular.js, Node.js). Volotopia is not to be viewed as a professional site, as it has been " + "quickly designed and constructed for sharpening, and training my development skills. ";
 
   this.signature = "-- Andrew A. Cisternino";
 };
@@ -40641,9 +40620,11 @@ var Airline = function () {
     value: function get(id) {
 
       return this._$http.get(this._AppConstants.api + '/airlines/' + id).then(function (res) {
+        console.log('Successfult airline grab.');
         return res.data;
       }).error(function (err) {
-        err;
+        console.log('Error grapping airline.');
+        return err;
       });
     }
   }, {
@@ -40757,9 +40738,11 @@ var Airport = function () {
     key: 'getAll',
     value: function getAll() {
       return this._$http.get(this._AppConstants.api + '/airports').success(function (res) {
-        res.data;
+        console.log('Successful airport grab.');
+        return res.data;
       }).error(function (err) {
-        err;
+        console.log('Error retrieving airports.');
+        return err;
       });
     }
   }]);

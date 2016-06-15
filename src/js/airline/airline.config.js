@@ -10,22 +10,16 @@ function AirlineConfig($stateProvider) {
     templateUrl: 'airline/airline.html',
     resolve: {
         airlineResolved: function($stateParams, Airline) {
-            return Airline.get($stateParams.id).then(
-              (airline) => airline,
-              (err) => $state.go('app.home')
-            );
+            return Airline.get($stateParams.id);
         },
         airportsResolved: function(Airport) {
-            return Airport.getAll().then(
-              (airports) => airports,
-              (err) => $state.go('app.home')
-            );
+            return Airport.getAll();
         }
     }
   })
-  .state('airline.routes', {
+  .state('.routes', {
               url: '',
-              templateUrl: '/airline-routes.html',
+              templateUrl: 'airline/airline-routes.html',
               controller: 'AirlineCtrl',
               controllerAs: '$ctrl',
               data: {
@@ -33,7 +27,7 @@ function AirlineConfig($stateProvider) {
 
               },
               resolve: {
-                  airline: ['$stateParams', 'Airline', function($stateParams, Airline) {
+                  airlineResolved: ['$stateParams', 'Airline', function($stateParams, Airline) {
                       return Airline.get($stateParams.id);
                   }],
                   airportsResolved: ['Airport', function(Airport) {
@@ -42,9 +36,9 @@ function AirlineConfig($stateProvider) {
               }
           })
 
-          .state('airline.comments', {
+          .state('.comments', {
               url: '/airlines/{id}/comments',
-              templateUrl: '/airline-comments.html',
+              templateUrl: 'airline/airline-comments.html',
               controller: 'AirlineCtrl',
               controllerAs: '$ctrl',
               data: {
@@ -52,7 +46,7 @@ function AirlineConfig($stateProvider) {
 
               },
               resolve: {
-                  airline: ['$stateParams', 'Airline', function($stateParams, Airline) {
+                  airlineResolved: ['$stateParams', 'Airline', function($stateParams, Airline) {
                       return Airline.get($stateParams.id);
                   }],
                   airportsResolved: ['Airport', function(Airport) {

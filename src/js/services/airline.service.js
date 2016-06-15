@@ -12,9 +12,12 @@ export default class Airline{
 
       return this._$http.get(this._AppConstants.api + '/airlines/' + id).then(
         (res) => {
+          console.log('Successfult airline grab.');
           return res.data;
       }).error(
-        (err) => {err;}
+        (err) => {
+          console.log('Error grapping airline.');
+          return err;}
       );
 
   }

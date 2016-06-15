@@ -4,16 +4,19 @@ class AirlineCtrl {
 
     this._$state = $state;
     this._Auth = Auth;
-    this._airline = airlineResolved;
-    this._airports = airportsResolved;
+    this.airline = airlineResolved.data;
+    this.airports = airportsResolved.data;
     this._Airline = Airline;
 
 
-    this._isAddComment = false;
-    this._isAddRouteVisible = false;
-    this._isEditRouteVisible = false;
-    this._editableRoute = {};
-    this._isLoggedIn = this._Auth.isLoggedIn;
+    this.isAddComment = false;
+    this.isAddRouteVisible = false;
+    this.isEditRouteVisible = false;
+    this.editableRoute = {};
+    this.isLoggedIn = this._Auth.isLoggedIn;
+
+    this.commentFormData = {};
+    this.addRouteFormData = {};
 
   }
 
@@ -34,26 +37,26 @@ class AirlineCtrl {
           return;
       }
       this._Airline.addComment(airline._id, {
-          body: this._body,
+          body: this.commentFormData.body,
           upvotes: 0
       }).success(
         (comment) => {
-          this._airline.comments.push(comment);
+          this.airline.comments.push(comment);
       });
-      this._body = '';
-      this._isAddComment = false;
+      this.commentFormData.body = '';
+      this.isAddComment = false;
   }
 
   showAddComment() {
-      return this._isAddComment;
+      return this.isAddComment;
   }
 
   addCommentClicked() {
-      this._isAddComment = true;
+      this.isAddComment = true;
   }
 
   removeCommentClicked() {
-      $this._isAddComment = false;
+      $this.isAddComment = false;
   }
 
   incrementRatings(airline) {
@@ -71,78 +74,64 @@ class AirlineCtrl {
   }
 
   addRoute() {
-      if (this.departureAirport === '' || $scope.departureDateTime === '' || $scope.arrivalAirport === '' || $scope.arrivalDateTime === '' || $scope.price === '' || $scope.occupied === '' || $scope.capacity === '') {
+      if (this.addRouteFormData.departureAirport === '' || this.addRouteFormData.departureDateTime === '' || this.addRouteFormData.arrivalAirport === '' || this.addRouteFormData.arrivalDateTime === '' || this.addRouteFormData.price === '' || this.addRouteFormData.occupied === '' || this.addRouteFormData.capacity === '') {
           return;
       }
 
-      var duration = getDuration($scope.departureDateTime, $scope.arrivalDateTime);
+      var duration = getDuration(this.addRouteFormData.departureDateTime, this.addRouteFormData.arrivalDateTime);
 
-      Airline.addRoute(this._airline._id, {
-          departureAirport: this._departureAirport,
-          departureDateTime: this._departureDateTime,
-          duration: this._duration,
-          arrivalDateTime: this._arrivalDateTime,
-          arrivalAirport: this._arrivalAirport,
-          price: this._price,
-          occupied: this._occupied,
-          capacity: this._capacity
+      Airline.addRoute(this.airline._id, {
+          departureAirport: this.addRouteFormData.departureAirport,
+          departureDateTime: this.addRouteFormData.departureDateTime,
+          duration: this.addRouteFormData.duration,
+          arrivalDateTime: this.addRouteFormData.arrivalDateTime,
+          arrivalAirport: this.addRouteFormData.arrivalAirport,
+          price: this.addRouteFormData.price,
+          occupied: this.addRouteFormData.occupied,
+          capacity: this.addRouteFormData.capacity
       }).success(
         (route) => {
-          this._airline.routes.push(route);
+          this.airline.routes.push(route);
       });
-      this._departureAirport = '';
-      this._departureDateTime = '';
-      this._duration = '';
-      this._arrivalAirport = '';
-      this._arrivalDateTime = '';
-      this._price = '';
-      this._occupied = '';
-      this._capacity = '';
-      this._isAddRouteVisible = false;
+      this.addRouteFormData.departureAirport = '';
+      this.addRouteFormData.departureDateTime = '';
+      this.addRouteFormData.duration = '';
+      this.addRouteFormData.arrivalAirport = '';
+      this.addRouteFormData.arrivalDateTime = '';
+      this.addRouteFormData.price = '';
+      this.addRouteFormData.occupied = '';
+      this.addRouteFormData.capacity = '';
+      this.isAddRouteVisible = false;
   }
 
   showAddRoute() {
-      return this._isAddRouteVisible;
+      return this.isAddRouteVisible;
   }
 
   addRouteClicked() {
-      this._isAddRouteVisible = true;
+      this.isAddRouteVisible = true;
   }
 
   removeRouteClicked() {
-      this._isAddRouteVisible = false;
+      this.isAddRouteVisible = false;
   }
 
   hideEditRouteForm() {
-      this._isEditRouteVisible = false;
+      this.isEditRouteVisible = false;
   }
 
   showEditRoute(route) {
-      this._isEditRouteVisible = true;
-      this._editableRoute = angular.copy(route);
+      this.isEditRouteVisible = true;
+      this.editableRoute = angular.copy(route);
 
   }
 
-  saveRoute() {
-      var duration = getDuration(this._editableRoute.departureDateTime, this._editableRoute.arrivalDateTime);
-      this._editableRoute.duration = duration;
-      this._Airline.editRoute(this._editableRoute._id, this._editableRoute)
-          .success(
-            (route) => {
-              this._airline.routes = $.grep(this._airline.routes, function(e) {
-                  return e._id != route._id;
-              });
-              this._airline.routes.push(route);
 
-          });
-      this._editableRoute = {};
-      this._isEditRouteVisible = false;
-  }
 
   deleteRoute(route) {
       this._Airline.deleteRoute(route._id).success(
         () => {
-          this._airline.routes = $.grep(this._airline.routes, function(e) {
+          this.airline.routes = $.grep(this.airline.routes, function(e) {
               return e._id != route._id;
           });
       });

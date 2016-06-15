@@ -48,7 +48,7 @@
                     <div class="form-group">
                         <label for="selectDepartAirport">Departure Airport</label>
                         <br/>
-                        <select required class="form-select" style="width: 400px;" id="selectDepartAirport" placeholder="Departure Airport" ng-model="$ctr.addRouteFormDatadepartureAirport" ng-options="airport._id as airport.code for airport in airports | orderBy: 'code'">
+                        <select required class="form-select" style="width: 400px;" id="selectDepartAirport" placeholder="Departure Airport" ng-model="$ctr.addRouteFormData.departureAirport" ng-options="airport._id as airport.code for airport in airports | orderBy: 'code'">
                             <option value="">-- Select Departure Airport --</option>
                         </select>
 

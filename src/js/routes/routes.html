@@ -39,12 +39,12 @@
                           </div>
                           <div class="col-sm-7" style="margin-top:5px;">
                               <div>
-                                  <span style="font-size:15px; ">{{route.departureDateTime }} (EST) </span><span style="font-weight: 800;color:navy;">{{route.departureAirport.code}} </span>
+                                  <span style="font-size:15px; ">{{route.departureDateTime | date:'M/d/yyyy HH:mm:ss'}} </span><span style="font-weight: 800;color:navy;">{{route.departureAirport.code}} </span>
 
                                   <span style="margin-left:5px"><i class="fa fa-long-arrow-right"></i></span>
                               </div>
                               <div>
-                                  <span style="font-size:15px;">{{route.arrivalDateTime}} (EST) </span><span style="font-weight: 800; color:navy;">{{route.arrivalAirport.code}}</span>
+                                  <span style="font-size:15px;">{{route.arrivalDateTime | date:'M/d/yyyy HH:mm:ss'}}  </span><span style="font-weight: 800; color:navy;">{{route.arrivalAirport.code}}</span>
                               </div>
                               <div style="font-size:15px;">
                                   <span>duration: ~{{route.duration}} </span>

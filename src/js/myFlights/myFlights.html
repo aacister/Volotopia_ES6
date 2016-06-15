@@ -14,7 +14,7 @@
                   </div>
                   <div class="col-sm-2" style="margin-top:2px">
                     <div  >
-                      <span style="font-size:16px; font-weight:600; margin-left:10px; color:navy;" ng-bind='flight.price'>
+                      <span style="font-size:16px; font-weight:600; margin-left:10px; color:navy;" ng-bind='flight.price | currency'>
 
                       </span>
                     </div>
@@ -27,16 +27,14 @@
 
                 <div class="col-sm-8">
                     <div>
-                        <span style="font-size:15px; " ng-bind="flight.departureDateTime"></span><span style="left-margin:15px; font-weight: 800;color:navy;" ng-bind='flight.departureAirport'> </span>
+                        <span style="font-size:15px; " ng-bind="flight.departureDateTime | date:'M/d/yyyy HH:mm:ss'"></span> <span style="left-margin:15px; font-weight: 800;color:navy;" ng-bind='flight.departureAirport'> </span>
 
                         <span style="margin-left:5px"><i class="fa fa-long-arrow-right"></i></span>
                     </div>
                     <div>
-                        <span style="font-size:15px;" ng-bind='flight.arrivalDateTime'>  </span><span style="left-margin:15px;font-weight: 800; color:navy;" ng-bind='flight.airrivalAirport'></span>
+                        <span style="font-size:15px;" ng-bind="flight.arrivalDateTime | date:'M/d/yyyy HH:mm:ss'">  </span> <span style="left-margin:15px;font-weight: 800; color:navy;" ng-bind='flight.airrivalAirport'></span>
                     </div>
-                    <div>
-                        <span style="font-size:15px;" ng-bind ='flight.duration'></span>
-                    </div>
+
                 </div>
             </div>
         </div>

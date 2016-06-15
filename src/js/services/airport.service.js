@@ -10,8 +10,13 @@ export default class Airport{
 
   getAll() {
       return this._$http.get(this._AppConstants.api + '/airports').success(
-        (res) => {res.data}).error(
-          (err) => {err;}
+        (res) => {
+          console.log('Successful airport grab.');
+          return res.data;
+        }).error(
+          (err) => {
+            console.log('Error retrieving airports.');
+            return err;}
         );
   };
 
