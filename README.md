@@ -11,3 +11,6 @@ Sessions are stored within LocalStorage.
 Angual UI router is utilized.
 Data is persisted to MongoDB utilizing node's Mongoose package.
 API router utilizes node's express.js package.
+
+Published to:
+https://volotopia.herokuapp.com/
