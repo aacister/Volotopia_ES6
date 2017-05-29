@@ -6,8 +6,9 @@ Uses Gulp task runner, Babel transpiler and Browserify bundler.
 
 Volotopia provides booking of flights to registered, and signed in users.  
 
-Volotopia provides LocalStorage login, or Google oAuth login (via node's GoogleStrategy pagckage).
-Sessions are stored within LocalStorage.
+Volotopia provides LocalStorage, or Google oAuth authentication (via node's GoogleStrategy pagckage).
+JWT Authorization (utilizes bCrypt password hashing)
+Sessions (jwt tokens) are stored within LocalStorage.
 Angual UI router is utilized.
 Data is persisted to MongoDB utilizing node's Mongoose package.
 API router utilizes node's express.js package.
